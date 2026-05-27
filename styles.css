@@ -503,6 +503,13 @@ h1 span {
   line-height: 1.72;
 }
 
+.app-section .section-header p {
+  max-width: 760px;
+  color: var(--muted-strong);
+  font-size: 17px;
+  line-height: 1.72;
+}
+
 .free-plan-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -641,6 +648,356 @@ h1 span {
   margin-right: auto;
 }
 
+.app-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr);
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.app-panel {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 22px;
+  background:
+    linear-gradient(180deg, rgba(79, 219, 255, 0.05), rgba(12, 22, 31, 0.62)),
+    var(--panel);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 22px 60px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(18px);
+}
+
+.app-panel.is-locked::after {
+  content: "로그인하면 활성화됩니다.";
+  position: absolute;
+  inset: auto 18px 18px auto;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 209, 102, 0.24);
+  background: rgba(255, 209, 102, 0.08);
+  color: var(--amber);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panel-head h3 {
+  margin: 6px 0 0;
+  font-size: 24px;
+}
+
+.ghost-button,
+.inline-button,
+.mode-button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.ghost-button {
+  padding: 0 14px;
+}
+
+.mode-switch {
+  display: inline-flex;
+  gap: 8px;
+  padding: 4px;
+  border: 1px solid rgba(79, 219, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  margin-bottom: 16px;
+}
+
+.mode-button {
+  min-width: 92px;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--muted-strong);
+}
+
+.mode-button.is-active {
+  background: rgba(79, 219, 255, 0.14);
+  color: var(--cyan);
+  border-color: rgba(79, 219, 255, 0.32);
+}
+
+.auth-form,
+.journal-form {
+  display: grid;
+  gap: 12px;
+}
+
+.auth-form label,
+.journal-form label {
+  display: grid;
+  gap: 7px;
+}
+
+.auth-form span,
+.journal-form span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.auth-form input,
+.journal-form input,
+.journal-form select,
+.journal-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+  outline: none;
+}
+
+.auth-form input,
+.journal-form input,
+.journal-form select {
+  min-height: 48px;
+}
+
+.journal-form textarea {
+  min-height: 110px;
+  padding: 14px;
+  resize: vertical;
+}
+
+.auth-form input:focus,
+.journal-form input:focus,
+.journal-form select:focus,
+.journal-form textarea:focus {
+  border-color: var(--line-hot);
+  box-shadow: 0 0 0 4px rgba(79, 219, 255, 0.1);
+}
+
+.journal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.journal-notes {
+  margin-top: 12px;
+}
+
+.journal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.journal-actions button {
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.journal-actions button[type="submit"] {
+  background: linear-gradient(135deg, var(--cyan), var(--green));
+  color: #03100d;
+  box-shadow: 0 0 38px rgba(79, 219, 255, 0.22), 0 18px 44px rgba(76, 255, 176, 0.14);
+}
+
+.ghost-button,
+.inline-button {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.inline-button {
+  min-height: 32px;
+  padding: 0 10px;
+  color: var(--ink);
+}
+
+.inline-button.danger {
+  color: var(--red);
+  border-color: rgba(255, 73, 106, 0.22);
+}
+
+.status-pill {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(76, 255, 176, 0.22);
+  background: rgba(76, 255, 176, 0.08);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stat-card {
+  min-height: 92px;
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  display: grid;
+  align-content: space-between;
+}
+
+.stat-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.stat-card strong {
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.stat-card strong[data-tone="cyan"] {
+  color: var(--cyan);
+}
+
+.stat-card strong[data-tone="green"] {
+  color: var(--green);
+}
+
+.stat-card strong[data-tone="amber"] {
+  color: var(--amber);
+}
+
+.stat-card strong[data-tone="red"] {
+  color: var(--red);
+}
+
+.stat-card strong[data-tone="violet"] {
+  color: var(--violet);
+}
+
+.journal-table-wrap {
+  margin-top: 18px;
+  overflow-x: auto;
+}
+
+.journal-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+}
+
+.journal-table th,
+.journal-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 14px;
+}
+
+.journal-table th {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.journal-table td.positive {
+  color: var(--green);
+  font-weight: 900;
+}
+
+.journal-table td.negative {
+  color: var(--red);
+  font-weight: 900;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.journal-empty {
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px dashed rgba(79, 219, 255, 0.28);
+  background: rgba(79, 219, 255, 0.05);
+}
+
+.journal-empty strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.signup-only[hidden],
+.auth-form[hidden],
+.session-card[hidden] {
+  display: none !important;
+}
+
+.session-card {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(76, 255, 176, 0.18);
+  background: rgba(3, 12, 10, 0.55);
+}
+
+.session-card span {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.session-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 18px;
+}
+
+.session-card p {
+  margin: 8px 0 0;
+  color: var(--muted-strong);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.form-note[data-tone="error"],
+.form-note[data-tone="loading"] {
+  color: var(--amber);
+}
+
+.form-note[data-tone="success"] {
+  color: var(--green);
+}
+
 .plan-strip {
   display: flex;
   flex-wrap: wrap;
@@ -777,6 +1134,14 @@ h1 span {
   .proof-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -838,6 +1203,28 @@ h1 span {
   .proof-strip,
   .waitlist-form {
     grid-template-columns: 1fr;
+  }
+
+  .stats-grid,
+  .journal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-head,
+  .journal-actions {
+    flex-direction: column;
+  }
+
+  .journal-actions button,
+  .ghost-button,
+  .mode-button {
+    width: 100%;
+  }
+
+  .mode-switch {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
   }
 
   .primary-panel {
