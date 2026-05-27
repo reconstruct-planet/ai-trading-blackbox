@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="AI가 반복 손실 패턴을 추적하는 코인 트레이딩 관제실">
+    <title>AI Trading Blackbox</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <canvas id="commandCanvas" aria-hidden="true"></canvas>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="AI Trading Blackbox 홈">
+        <span class="brand-mark">BB</span>
+        <span>
+          <strong>AI Trading Blackbox</strong>
+          <small>Crypto Command Center</small>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="주요 섹션">
+        <a href="#patterns">패턴</a>
+        <a href="#workflow">워크플로우</a>
+        <a href="#security">보안</a>
+      </nav>
+      <a class="header-cta" href="#waitlist">베타 신청</a>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="signal-label">LIVE RISK INTELLIGENCE</p>
+          <h1 id="hero-title">
+            <span>당신의 반복</span>
+            <span>손실 패턴을</span>
+            <span>추적하는 AI</span>
+            <span>트레이딩 관제실</span>
+          </h1>
+          <p class="hero-subtitle">
+            거래소 데이터를 연결하면 AI가 손절 미준수, FOMO, 과도한 레버리지, 물타기 패턴을 찾아 주간 복기 리포트로 정리합니다.
+          </p>
+          <div class="hero-actions" aria-label="주요 행동">
+            <a class="primary-action" href="#waitlist">내 손실 패턴 분석하기</a>
+            <button class="secondary-action" id="demoPulse" type="button">데모 스캔 실행</button>
+          </div>
+        </div>
+
+        <div class="command-deck" aria-label="제품 미리보기">
+          <div class="deck-topline">
+            <span>BLACKBOX SCAN</span>
+            <strong id="scanStatus">ACTIVE</strong>
+          </div>
+          <div class="deck-grid">
+            <article class="glass-panel primary-panel">
+              <span class="panel-kicker">Most Expensive Mistake</span>
+              <strong>손절 미준수</strong>
+              <p>-471.35 USDT / 최근 8거래</p>
+              <div class="risk-bar"><span style="width: 84%"></span></div>
+            </article>
+            <article class="glass-panel">
+              <span class="panel-kicker">Rule Compliance</span>
+              <strong>38%</strong>
+              <p>손절가 입력 거래 기준</p>
+            </article>
+            <article class="glass-panel">
+              <span class="panel-kicker">AI Insight</span>
+              <strong>12개 중 9개</strong>
+              <p>FOMO 태그 손실이 10배 이상 레버리지에서 반복</p>
+            </article>
+            <article class="glass-panel">
+              <span class="panel-kicker">Next Rule</span>
+              <strong>진입 전 손절가 고정</strong>
+              <p>다음 주 체크리스트 1순위</p>
+            </article>
+          </div>
+          <div class="ai-feed" id="aiFeed" aria-label="AI 분석 로그">
+            <span>AI LOG</span>
+            <p>BTCUSDT 손실 거래 4건에서 동일한 규칙 위반 감지</p>
+            <p>Revenge 태그 + 10x 이상 레버리지 구간 위험도 상승</p>
+            <p>다음 거래 전 체크리스트에 손절가 잠금 권장</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="proof-strip" aria-label="핵심 가치">
+        <div>
+          <strong>30초</strong>
+          <span>거래 기록 목표</span>
+        </div>
+        <div>
+          <strong>3개</strong>
+          <span>가장 비싼 실수</span>
+        </div>
+        <div>
+          <strong>Read-only</strong>
+          <span>출금 권한 차단</span>
+        </div>
+        <div>
+          <strong>Weekly</strong>
+          <span>AI 복기 리포트</span>
+        </div>
+      </section>
+
+      <section class="section split-section" id="problem">
+        <div class="section-copy">
+          <p class="section-label">THE REAL PROBLEM</p>
+          <h2>기록 부족보다 더 위험한 건, 손실 원인을 기억하지 못하는 것입니다.</h2>
+          <p>
+            트레이더는 거래 직후엔 이유를 안다고 생각하지만, 며칠 뒤 복기할 때는 감정, 진입 근거, 손절 변경, 시장 맥락이 흐려집니다. Blackbox는 거래의 숫자와 행동 기록을 묶어 반복 손실을 드러냅니다.
+          </p>
+        </div>
+        <div class="problem-stack">
+          <div class="warning-row"><span>01</span> 손절가를 낮추고 버틴 거래</div>
+          <div class="warning-row"><span>02</span> 급등 캔들 추격 진입</div>
+          <div class="warning-row"><span>03</span> 손실 만회용 레버리지 확대</div>
+          <div class="warning-row"><span>04</span> 복기 없이 반복되는 같은 실수</div>
+        </div>
+      </section>
+
+      <section class="section" id="patterns">
+        <div class="section-header">
+          <p class="section-label">PATTERN ENGINE</p>
+          <h2>AI가 잡아야 할 것은 수익률이 아니라 행동 패턴입니다.</h2>
+        </div>
+        <div class="pattern-grid">
+          <article class="feature-card">
+            <span>01</span>
+            <h3>손실 패턴</h3>
+            <p>종목, 시간대, 전략, 레버리지, 태그를 묶어 가장 비싼 반복 실수를 계산합니다.</p>
+          </article>
+          <article class="feature-card">
+            <span>02</span>
+            <h3>감정 패턴</h3>
+            <p>FOMO, Revenge, Fear, Calm 상태별 손익 차이를 보여주고 위험한 조합을 감지합니다.</p>
+          </article>
+          <article class="feature-card">
+            <span>03</span>
+            <h3>규칙 위반</h3>
+            <p>진입 전 손절가, 계획 R, 포지션 크기 같은 약속을 실제 거래 결과와 대조합니다.</p>
+          </article>
+          <article class="feature-card">
+            <span>04</span>
+            <h3>주간 복기</h3>
+            <p>이번 주 가장 비싼 실수와 다음 주 지켜야 할 단 하나의 규칙을 정리합니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section workflow-section" id="workflow">
+        <div class="section-header">
+          <p class="section-label">COMMAND FLOW</p>
+          <h2>거래소 연결부터 다음 거래 전 체크리스트까지 하나의 루틴으로.</h2>
+        </div>
+        <div class="workflow">
+          <div class="workflow-step">
+            <span>01</span>
+            <strong>Connect</strong>
+            <p>Binance 또는 Bybit read-only API와 CSV를 가져옵니다.</p>
+          </div>
+          <div class="workflow-step">
+            <span>02</span>
+            <strong>Normalize</strong>
+            <p>체결 데이터를 포지션 단위로 묶고 수수료, 레버리지, R 값을 정리합니다.</p>
+          </div>
+          <div class="workflow-step">
+            <span>03</span>
+            <strong>Detect</strong>
+            <p>AI가 반복 손실, 감정 태그, 규칙 위반, 위험한 시간대를 스캔합니다.</p>
+          </div>
+          <div class="workflow-step">
+            <span>04</span>
+            <strong>Review</strong>
+            <p>주간 리포트와 다음 주 체크리스트로 행동을 교정합니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section security-section" id="security">
+        <div class="security-panel">
+          <div>
+            <p class="section-label">SECURITY POSTURE</p>
+            <h2>트레이딩 제품의 신뢰는 API 키 화면에서 결정됩니다.</h2>
+          </div>
+          <ul class="security-list">
+            <li>출금 권한 없는 read-only 키만 허용</li>
+            <li>권한 과다 감지 시 연결 차단</li>
+            <li>저장 시 암호화, 언제든 키 삭제</li>
+            <li>AI는 투자 조언이 아닌 거래 기록 분석으로 제한</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section waitlist-section" id="waitlist">
+        <p class="section-label">BETA ACCESS</p>
+        <h2>첫 베타는 코인 선물/단타 트레이더 30명만 받습니다.</h2>
+        <p>
+          목표는 기능 수가 아니라, 첫 주 안에 사용자가 자신의 가장 비싼 반복 실수 하나를 발견하게 만드는 것입니다.
+        </p>
+        <form class="waitlist-form" id="waitlistForm">
+          <label>
+            <span>이메일</span>
+            <input type="email" name="email" placeholder="trader@example.com" required>
+          </label>
+          <label>
+            <span>주 거래소</span>
+            <select name="exchange">
+              <option>Binance</option>
+              <option>Bybit</option>
+              <option>Upbit</option>
+              <option>Bithumb</option>
+            </select>
+          </label>
+          <button type="submit">베타 신청하기</button>
+        </form>
+        <p class="form-note" id="formNote">read-only 연결과 CSV 업로드부터 지원합니다.</p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
