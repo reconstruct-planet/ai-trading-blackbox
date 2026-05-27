@@ -61,13 +61,13 @@
             </article>
             <article class="glass-panel">
               <span class="panel-kicker">Plan</span>
-              <strong id="heroPlanValue">Phase 1</strong>
-              <p id="heroPlanMeta">localStorage 기반 로그인, 거래일지, 대시보드</p>
+              <strong id="heroPlanValue">Server</strong>
+              <p id="heroPlanMeta">Node + SQLite 기반 로그인, 거래일지, 대시보드</p>
             </article>
             <article class="glass-panel">
               <span class="panel-kicker">Data Layer</span>
-              <strong id="heroDataValue">Browser Storage</strong>
-              <p id="heroDataMeta">이 브라우저에 저장되고 새로고침 후 다시 불러옵니다.</p>
+              <strong id="heroDataValue">Server DB</strong>
+              <p id="heroDataMeta">로그인한 계정의 데이터가 서버에 저장되고 다시 불러와집니다.</p>
             </article>
             <article class="glass-panel">
               <span class="panel-kicker">Next Rule</span>
@@ -78,8 +78,8 @@
           <div class="ai-feed" id="aiFeed" aria-label="AI 분석 로그">
             <span>AI LOG</span>
             <p>데이터를 저장하면 반복 손실, 감정 태그, 위험한 거래 습관을 바로 보여줍니다.</p>
-            <p>지금 단계는 브라우저 저장 기반 MVP입니다.</p>
-            <p>거래소 API 동기화는 Phase 2로 분리했습니다.</p>
+            <p>지금 단계는 서버 SQLite 기반의 실사용 앱입니다.</p>
+            <p>거래소 API 동기화는 다음 기능 묶음으로 확장됩니다.</p>
           </div>
         </div>
       </section>
@@ -90,12 +90,12 @@
           <span>로그인 즉시 사용</span>
         </div>
         <div>
-          <strong>Local MVP</strong>
+          <strong>Server App</strong>
           <span>가입 후 바로 사용</span>
         </div>
         <div>
-          <strong>Browser Storage</strong>
-          <span>새로고침 후 유지</span>
+          <strong>Server DB</strong>
+          <span>다시 접속해도 유지</span>
         </div>
         <div>
           <strong>Weekly</strong>
@@ -108,22 +108,22 @@
           <p class="section-label">FREE PLAN</p>
           <h2>지금 실제로 되는 Free Plan 기능과 다음 단계 기능을 분리해 보여줍니다.</h2>
           <p>
-            현재 공개된 페이지는 브라우저 저장소를 쓰는 Phase 1 MVP입니다. 실제 로그인, 거래일지 CRUD, 대시보드 표시, 새로고침 후 복구는 동작하고, 거래소 API 동기화와 서버 저장은 다음 단계입니다.
+            현재 공개된 페이지는 서버 SQLite를 쓰는 실사용 앱입니다. 실제 로그인, 거래일지 CRUD, 대시보드 표시, 새로고침 후 복구, 거래소 연결 기록, 주간 복기 생성이 동작하고, 거래소 API 동기화와 자동 리포트는 다음 단계로 이어집니다.
           </p>
         </div>
         <div class="free-plan-grid">
           <article class="plan-card is-live">
-            <span>Live in Phase 1</span>
+            <span>Live now</span>
             <h3>회원가입 / 로그인</h3>
-            <p>브라우저 저장소에 계정을 만들고 로그인해서 내 거래 데이터를 분리해 저장합니다.</p>
+            <p>계정을 만들고 로그인하면 내 거래 데이터를 서버에 분리 저장합니다.</p>
           </article>
           <article class="plan-card">
-            <span>Live in Phase 1</span>
+            <span>Live now</span>
             <h3>매매일지 CRUD</h3>
             <p>종목, 방향, 진입가, 청산가, 수량, 레버리지, 감정 태그, 메모를 저장하고 수정/삭제합니다.</p>
           </article>
           <article class="plan-card">
-            <span>Live in Phase 1</span>
+            <span>Live now</span>
             <h3>대시보드와 통계</h3>
             <p>실제 저장된 거래 수, 손익 합계, 승률, 최근 거래가 카드와 목록으로 표시됩니다.</p>
           </article>
@@ -133,7 +133,7 @@
             <p>Binance Futures, Bybit Derivatives, OKX Futures의 read-only API 동기화는 Phase 2에서 붙입니다.</p>
           </article>
           <article class="plan-card">
-            <span>Live in Phase 1</span>
+            <span>Live now</span>
             <h3>AI 손실 패턴 스캔</h3>
             <p>저장된 거래를 기준으로 손절 미준수, FOMO, Revenge trade, 과도한 레버리지를 분석합니다.</p>
           </article>
@@ -238,7 +238,7 @@
         <p class="section-label">LIVE MVP</p>
         <h2>가입하고 로그인하면 바로 내 거래일지가 저장됩니다.</h2>
         <p>
-          Phase 1은 브라우저 저장소를 이용한 실사용 플로우입니다. 계정을 만들고 로그인한 뒤 거래를 입력하면 저장되고, 새로고침 후에도 다시 불러와집니다.
+          이제 데이터는 서버 SQLite에 저장됩니다. 계정을 만들고 로그인한 뒤 거래를 입력하면 서버에 저장되고, 새로고침이나 다른 탭에서도 다시 불러와집니다.
         </p>
         <div class="plan-strip" aria-label="현재 가능한 기능">
           <span>회원가입</span>
@@ -278,11 +278,11 @@
               <button type="submit" id="authSubmit">회원가입</button>
             </form>
 
-            <p class="form-note" id="authNote">브라우저 저장소에만 저장되는 Phase 1 데모입니다. 실제 서버 로그인은 다음 단계에 연결합니다.</p>
+            <p class="form-note" id="authNote">계정은 서버에 저장되고 로그인하면 바로 거래일지를 쓸 수 있습니다.</p>
             <div class="session-card" id="sessionCard" hidden>
               <span>SESSION</span>
               <strong id="sessionEmail">-</strong>
-              <p>새로고침해도 이 브라우저에서는 같은 계정이 유지됩니다.</p>
+              <p>새로고침하거나 다시 접속해도 같은 계정 상태가 유지됩니다.</p>
             </div>
           </article>
 
@@ -312,6 +312,13 @@
                   </select>
                 </label>
                 <label>
+                  <span>시장 구분</span>
+                  <select name="marketType" required>
+                    <option value="futures">Futures</option>
+                    <option value="spot">Spot</option>
+                  </select>
+                </label>
+                <label>
                   <span>진입가</span>
                   <input type="number" name="entryPrice" min="0" step="0.01" placeholder="62000" required>
                 </label>
@@ -328,6 +335,22 @@
                   <input type="number" name="leverage" min="1" step="1" placeholder="10" required>
                 </label>
                 <label>
+                  <span>수수료</span>
+                  <input type="number" name="fee" min="0" step="0.01" placeholder="0.00">
+                </label>
+                <label>
+                  <span>계획 손절가</span>
+                  <input type="number" name="plannedStop" min="0" step="0.01" placeholder="61500">
+                </label>
+                <label>
+                  <span>계획 익절가</span>
+                  <input type="number" name="plannedTakeProfit" min="0" step="0.01" placeholder="63500">
+                </label>
+                <label>
+                  <span>계획 R</span>
+                  <input type="number" name="plannedR" step="0.1" placeholder="2.0">
+                </label>
+                <label>
                   <span>감정</span>
                   <select name="emotion" required>
                     <option value="calm">Calm</option>
@@ -337,6 +360,14 @@
                   </select>
                 </label>
                 <label>
+                  <span>전략 태그</span>
+                  <input type="text" name="strategyTags" placeholder="breakout, scalp">
+                </label>
+                <label>
+                  <span>실수 태그</span>
+                  <input type="text" name="mistakeTags" placeholder="손절미준수, 추격진입">
+                </label>
+                <label>
                   <span>거래 날짜</span>
                   <input type="date" name="tradeDate" required>
                 </label>
@@ -344,6 +375,10 @@
               <label class="journal-notes">
                 <span>메모</span>
                 <textarea name="note" rows="4" placeholder="진입 근거, 손절 이유, 복기 메모를 적어주세요." required></textarea>
+              </label>
+              <label class="journal-notes">
+                <span>스크린샷</span>
+                <input type="file" name="attachments" accept="image/*" multiple>
               </label>
               <div class="journal-actions">
                 <button type="submit" id="tradeSubmit">거래 저장</button>
@@ -364,9 +399,11 @@
                   <tr>
                     <th>날짜</th>
                     <th>심볼</th>
+                    <th>시장</th>
                     <th>방향</th>
                     <th>손익</th>
                     <th>감정</th>
+                    <th>태그</th>
                     <th>메모</th>
                     <th>작업</th>
                   </tr>
@@ -374,6 +411,123 @@
                 <tbody id="tradeTableBody"></tbody>
               </table>
             </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="connections">
+        <div class="section-header">
+          <p class="section-label">EXCHANGE CONNECTIONS</p>
+          <h2>거래소 연결은 읽기 전용과 키 삭제를 기본으로 둡니다.</h2>
+          <p>Binance, Bybit, OKX 연결 정보를 저장하고, 언제든 삭제할 수 있습니다. 실제 주문 권한은 저장 단계부터 막습니다.</p>
+        </div>
+        <div class="connections-layout">
+          <article class="app-panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">CONNECT</p>
+                <h3>거래소 연결 추가</h3>
+              </div>
+            </div>
+            <form class="auth-form" id="connectionForm">
+              <label>
+                <span>거래소</span>
+                <select name="exchange" required>
+                  <option>Binance Futures</option>
+                  <option>Bybit Derivatives</option>
+                  <option>OKX Futures</option>
+                </select>
+              </label>
+              <label>
+                <span>연결 이름</span>
+                <input type="text" name="label" placeholder="주력 선물 계정" required>
+              </label>
+              <label>
+                <span>권한 모드</span>
+                <select name="permissionMode" required>
+                  <option value="read-only">Read-only</option>
+                  <option value="disabled">Disabled by policy</option>
+                </select>
+              </label>
+              <label>
+                <span>API Key 마지막 4자리</span>
+                <input type="text" name="apiKeyLast4" placeholder="A1B2">
+              </label>
+              <label>
+                <span>메모</span>
+                <textarea name="notes" rows="3" placeholder="읽기 전용 키만 등록합니다."></textarea>
+              </label>
+              <button type="submit">연결 저장</button>
+            </form>
+          </article>
+          <article class="app-panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">CONNECTIONS</p>
+                <h3>저장된 연결</h3>
+              </div>
+            </div>
+            <div class="connection-list" id="connectionList"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="review">
+        <div class="section-header">
+          <p class="section-label">WEEKLY REVIEW</p>
+          <h2>이번 주 가장 비싼 실수와 다음 주 규칙을 자동으로 보여줍니다.</h2>
+        </div>
+        <div class="review-grid">
+          <article class="review-card">
+            <span>SUMMARY</span>
+            <strong id="reviewSummary">로그인 후 생성됩니다.</strong>
+            <p id="reviewRange">-</p>
+          </article>
+          <article class="review-card">
+            <span>CHECKLIST</span>
+            <ul id="reviewChecklist"></ul>
+          </article>
+          <article class="review-card">
+            <span>DETAIL</span>
+            <p id="reviewDetail">-</p>
+            <button class="ghost-button" id="generateReviewBtn" type="button">이번 주 복기 생성</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="calendar">
+        <div class="section-header">
+          <p class="section-label">CALENDAR</p>
+          <h2>일별 PnL 캘린더로 거래 결과를 한눈에 봅니다.</h2>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </section>
+
+      <section class="section" id="settings">
+        <div class="section-header">
+          <p class="section-label">SETTINGS</p>
+          <h2>데이터 내보내기, 계정 삭제, 민감 키 정리까지 포함합니다.</h2>
+        </div>
+        <div class="settings-layout">
+          <article class="app-panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">EXPORT</p>
+                <h3>데이터 내보내기</h3>
+              </div>
+            </div>
+            <p class="form-note">거래, 연결, 주간 복기 데이터를 JSON으로 내려받을 수 있습니다.</p>
+            <button class="ghost-button" id="exportBtn" type="button">JSON 다운로드</button>
+          </article>
+          <article class="app-panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">DANGER ZONE</p>
+                <h3>계정 삭제</h3>
+              </div>
+            </div>
+            <p class="form-note">계정과 연결, 거래, 리뷰를 모두 삭제합니다.</p>
+            <button class="ghost-button danger" id="deleteAccountBtn" type="button">내 계정 삭제</button>
           </article>
         </div>
       </section>

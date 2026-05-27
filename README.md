@@ -1,18 +1,38 @@
 # AI Trading Blackbox
 
-Premium dark MVP shell for a crypto futures trading journal. Phase 1 is a browser-storage app with signup, login, trade CRUD, and a live dashboard.
+AI Trading Blackbox is a premium dark crypto futures trading journal with a real login flow, server-backed trade storage, dashboard statistics, exchange connection records, and weekly review generation.
 
-## Concept
+## What it does
 
-AI Trading Blackbox is positioned as a futuristic crypto trading command center, not a generic trade journal. The first-screen promise is simple: sign up, log in, save trades, review the dashboard, and persist the data in the browser. Exchange API sync is planned for the next phase.
+- Sign up and log in with a real server session
+- Create, edit, and delete trades
+- Store screenshots as trade attachments
+- Track exchange connection records
+- Generate weekly review summaries and checklists
+- Persist data in a local SQLite database so it survives reloads and restarts
+
+## Run locally
+
+1. Make sure Node.js 24 is available.
+2. Start the app:
+
+```bash
+npm start
+```
+
+3. Open [http://127.0.0.1:4173/](http://127.0.0.1:4173/)
+
+## Data storage
+
+- SQLite database: `data/app.sqlite`
+- Uploaded attachments: `data/uploads/`
+
+The `data/` directory is created automatically at runtime and is ignored by git.
 
 ## Files
 
-- `index.html` - landing page plus app shell
-- `styles.css` - premium dark UI, glass panels, responsive layout, dashboard components
-- `app.js` - animated command-center canvas, localStorage auth, trade CRUD, dashboard logic
-- `crypto-trading-journal-product-plan.md` - product and MVP plan
-
-## Local Preview
-
-Open `index.html` directly in a browser. No build step is required.
+- `index.html` - product shell and app surface
+- `styles.css` - premium dark UI and responsive layout
+- `app.js` - browser client, API calls, dashboard rendering, and interactions
+- `server.mjs` - Node + SQLite backend and static file server
+- `crypto-trading-journal-product-plan.md` - original product planning notes
