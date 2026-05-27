@@ -84,6 +84,13 @@ const streams = Array.from({ length: 22 }, (_, index) => ({
   hue: index % 4
 }));
 
+const STATIC_API_KEYS = {
+  users: "atb.static.users.v1",
+  session: "atb.static.session.v1"
+};
+
+let staticApiMode = false;
+
 function request(path, options = {}) {
   return fetch(path, {
     credentials: "include",
@@ -95,12 +102,302 @@ function request(path, options = {}) {
   }).then(async (response) => {
     const contentType = response.headers.get("content-type") || "";
     const payload = contentType.includes("application/json") ? await response.json() : await response.text();
+    if (path.startsWith("/api/") && response.status === 404 && !contentType.includes("application/json")) {
+      staticApiMode = true;
+      return localApiRequest(path, options);
+    }
     if (!response.ok) {
       const message = payload?.error || payload || "request_failed";
       throw new Error(message);
     }
     return payload;
+  }).catch((error) => {
+    if (path.startsWith("/api/") && (staticApiMode || error instanceof TypeError)) {
+      staticApiMode = true;
+      return localApiRequest(path, options);
+    }
+    throw error;
   });
+}
+
+function localRead(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function localWrite(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function localId() {
+  return window.crypto?.randomUUID?.() || `id_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+}
+
+async function localHash(value) {
+  const text = String(value || "");
+  if (!window.crypto?.subtle) return btoa(unescape(encodeURIComponent(text)));
+  const digest = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function localUsers() {
+  const users = localRead(STATIC_API_KEYS.users, []);
+  return Array.isArray(users) ? users : [];
+}
+
+function saveLocalUsers(users) {
+  localWrite(STATIC_API_KEYS.users, users);
+}
+
+function localSessionId() {
+  return localRead(STATIC_API_KEYS.session, null)?.userId || null;
+}
+
+function setLocalSession(userId) {
+  localWrite(STATIC_API_KEYS.session, { userId });
+}
+
+function clearLocalSession() {
+  localStorage.removeItem(STATIC_API_KEYS.session);
+}
+
+function localCurrentUser() {
+  const userId = localSessionId();
+  return localUsers().find((user) => user.id === userId) || null;
+}
+
+function localPublicUser(user) {
+  if (!user) return null;
+  return {
+    id: user.id,
+    email: user.email,
+    created_at: user.created_at,
+    profile: { user_id: user.id, free_plan: 1, timezone: "Asia/Seoul" }
+  };
+}
+
+function localPnl(trade) {
+  const delta = trade.side === "short" ? trade.entry_price - trade.exit_price : trade.exit_price - trade.entry_price;
+  return delta * trade.quantity - Number(trade.fee || 0);
+}
+
+function localStats(trades) {
+  const count = trades.length;
+  const pnl = trades.reduce((sum, trade) => sum + localPnl(trade), 0);
+  const wins = trades.filter((trade) => localPnl(trade) > 0).length;
+  return {
+    count,
+    pnl,
+    wins,
+    winRate: count ? Math.round((wins / count) * 100) : 0,
+    avgLeverage: count ? trades.reduce((sum, trade) => sum + Number(trade.leverage || 0), 0) / count : 0,
+    worst: [...trades].sort((a, b) => localPnl(a) - localPnl(b))[0] || null,
+    latest: trades[0] || null
+  };
+}
+
+function localCalendar(trades) {
+  const map = new Map();
+  trades.forEach((trade) => {
+    map.set(trade.trade_date, (map.get(trade.trade_date) || 0) + localPnl(trade));
+  });
+  return [...map.entries()].map(([date, pnl]) => ({ date, pnl }));
+}
+
+function localWeekStart() {
+  const now = new Date();
+  const diff = (now.getDay() + 6) % 7;
+  now.setDate(now.getDate() - diff);
+  return now.toISOString().slice(0, 10);
+}
+
+function localWeeklyReview(trades) {
+  const start = localWeekStart();
+  const endDate = new Date(start);
+  endDate.setDate(endDate.getDate() + 6);
+  const end = endDate.toISOString().slice(0, 10);
+  const scoped = trades.filter((trade) => trade.trade_date >= start && trade.trade_date <= end);
+  const scored = scoped.map((trade) => ({ ...trade, pnl: localPnl(trade) }));
+  const total = scored.reduce((sum, trade) => sum + trade.pnl, 0);
+  const worst = [...scored].sort((a, b) => a.pnl - b.pnl)[0] || null;
+  const summary = scoped.length
+    ? `이번 주 ${start} ~ ${end} 사이 ${scoped.length}건의 거래에서 총 손익 ${total.toFixed(2)} USDT. 가장 큰 손실은 ${worst?.symbol || "-"}입니다.`
+    : `이번 주 ${start} ~ ${end}에는 저장된 거래가 없습니다.`;
+  return {
+    weekStart: start,
+    weekEnd: end,
+    summary,
+    checklist: ["진입 전에 손절가를 먼저 적기", "감정 태그를 거래 후 즉시 남기기", "계획 R 대비 실제 R을 기록하기"],
+    topWins: scored.filter((trade) => trade.pnl >= 0).slice(0, 3).map((trade) => `${trade.symbol} · ${trade.pnl.toFixed(2)} USDT`),
+    topLosses: scored.filter((trade) => trade.pnl < 0).slice(0, 3).map((trade) => `${trade.symbol} · ${trade.pnl.toFixed(2)} USDT`),
+    worstTrade: worst,
+    bestTrade: [...scored].sort((a, b) => b.pnl - a.pnl)[0] || null
+  };
+}
+
+function localTradeFromBody(body, existing = {}) {
+  const now = new Date().toISOString();
+  const entry = Number(body.entryPrice ?? body.entry_price ?? existing.entry_price ?? 0);
+  const exit = Number(body.exitPrice ?? body.exit_price ?? existing.exit_price ?? 0);
+  const quantity = Number(body.quantity ?? existing.quantity ?? 0);
+  const fee = Number(body.fee ?? existing.fee ?? 0);
+  const side = String(body.side || existing.side || "long");
+  const plannedStop = body.plannedStop != null && body.plannedStop !== "" ? Number(body.plannedStop) : null;
+  const pnl = (side === "short" ? entry - exit : exit - entry) * quantity - fee;
+  const risk = plannedStop ? Math.abs(entry - plannedStop) * quantity : 0;
+  return {
+    id: existing.id || localId(),
+    symbol: String(body.symbol || existing.symbol || "").trim().toUpperCase(),
+    market_type: String(body.marketType || body.market_type || existing.market_type || "futures"),
+    side,
+    entry_price: entry,
+    exit_price: exit,
+    quantity,
+    fee,
+    leverage: Number(body.leverage ?? existing.leverage ?? 1),
+    planned_stop: plannedStop,
+    planned_take_profit: body.plannedTakeProfit != null && body.plannedTakeProfit !== "" ? Number(body.plannedTakeProfit) : null,
+    planned_r: body.plannedR != null && body.plannedR !== "" ? Number(body.plannedR) : null,
+    actual_r: risk ? Number((pnl / risk).toFixed(2)) : null,
+    strategy_tags: body.strategyTags || body.strategy_tags || existing.strategy_tags || [],
+    emotion_tags: body.emotionTags || body.emotion_tags || existing.emotion_tags || [],
+    mistake_tags: body.mistakeTags || body.mistake_tags || existing.mistake_tags || [],
+    note: String(body.note || existing.note || ""),
+    source: String(body.source || existing.source || "manual"),
+    trade_date: String(body.tradeDate || body.trade_date || existing.trade_date || now.slice(0, 10)),
+    created_at: existing.created_at || now,
+    updated_at: now
+  };
+}
+
+function parseLocalCsv(text) {
+  const lines = String(text || "").split(/\r?\n/).filter((line) => line.trim());
+  if (lines.length < 2) return [];
+  const headers = lines.shift().split(",").map((item) => item.trim().toLowerCase());
+  return lines.map((line) => {
+    const cells = line.split(",").map((item) => item.trim());
+    return Object.fromEntries(headers.map((header, index) => [header, cells[index] || ""]));
+  });
+}
+
+function localImportCsv(text) {
+  const rows = parseLocalCsv(text);
+  const user = localCurrentUser();
+  if (!user) throw new Error("unauthorized");
+  const imported = rows.map((row) =>
+    localTradeFromBody({
+      symbol: row.symbol || row.pair,
+      side: row.side || "long",
+      entryPrice: row.entry_price || row.entry || row.open_price,
+      exitPrice: row.exit_price || row.exit || row.close_price,
+      quantity: row.quantity || row.qty || row.size,
+      fee: row.fee || 0,
+      leverage: row.leverage || 1,
+      tradeDate: row.trade_date || row.date,
+      note: row.note || "CSV import",
+      source: "csv",
+      strategyTags: ["csv-import"]
+    })
+  ).filter((trade) => trade.symbol && trade.entry_price && trade.exit_price && trade.quantity);
+  const users = localUsers().map((entry) => entry.id === user.id ? { ...entry, trades: [...imported, ...(entry.trades || [])] } : entry);
+  saveLocalUsers(users);
+  return { ok: true, imported: imported.length, updated: 0 };
+}
+
+async function localApiRequest(path, options = {}) {
+  const method = String(options.method || "GET").toUpperCase();
+  const body = options.body ? JSON.parse(options.body) : {};
+  const users = localUsers();
+  const user = localCurrentUser();
+  const url = new URL(path, window.location.origin);
+
+  if (path === "/api/session" && method === "GET") return { user: localPublicUser(user) };
+  if (path === "/api/auth/signup" && method === "POST") {
+    const email = String(body.email || "").trim().toLowerCase();
+    if (users.some((entry) => entry.email === email)) throw new Error("email_exists");
+    const nextUser = { id: localId(), email, passwordHash: await localHash(body.password), created_at: new Date().toISOString(), trades: [], connections: [] };
+    saveLocalUsers([...users, nextUser]);
+    setLocalSession(nextUser.id);
+    return { user: localPublicUser(nextUser) };
+  }
+  if (path === "/api/auth/login" && method === "POST") {
+    const email = String(body.email || "").trim().toLowerCase();
+    const found = users.find((entry) => entry.email === email);
+    if (!found || found.passwordHash !== await localHash(body.password)) throw new Error("invalid_credentials");
+    setLocalSession(found.id);
+    return { user: localPublicUser(found) };
+  }
+  if (path === "/api/auth/logout" && method === "POST") {
+    clearLocalSession();
+    return { ok: true };
+  }
+  if (!user) throw new Error("unauthorized");
+  const trades = [...(user.trades || [])].sort((a, b) => new Date(b.trade_date) - new Date(a.trade_date));
+  if (path === "/api/trades" && method === "GET") return { trades, attachments: [] };
+  if (path === "/api/trades" && method === "POST") {
+    const trade = localTradeFromBody(body);
+    saveLocalUsers(users.map((entry) => entry.id === user.id ? { ...entry, trades: [trade, ...(entry.trades || [])] } : entry));
+    return { trade };
+  }
+  if (path.startsWith("/api/trades/") && method === "PUT") {
+    const tradeId = path.split("/").pop();
+    const existing = trades.find((trade) => trade.id === tradeId);
+    const trade = localTradeFromBody(body, existing);
+    saveLocalUsers(users.map((entry) => entry.id === user.id ? { ...entry, trades: (entry.trades || []).map((item) => item.id === tradeId ? trade : item) } : entry));
+    return { trade };
+  }
+  if (path.startsWith("/api/trades/") && method === "DELETE") {
+    const tradeId = path.split("/").pop();
+    saveLocalUsers(users.map((entry) => entry.id === user.id ? { ...entry, trades: (entry.trades || []).filter((item) => item.id !== tradeId) } : entry));
+    return { ok: true };
+  }
+  if (path === "/api/summary" && method === "GET") return { summary: localStats(trades), calendar: localCalendar(trades), review: localWeeklyReview(trades) };
+  if (path.startsWith("/api/weekly-review") && method === "GET") return { computed: localWeeklyReview(trades), review: localWeeklyReview(trades) };
+  if (path === "/api/connections" && method === "GET") return { connections: user.connections || [] };
+  if (path === "/api/connections" && method === "POST") {
+    const connection = {
+      id: localId(),
+      exchange: body.exchange,
+      label: body.label,
+      status: "active",
+      api_key_last4: String(body.apiKeyLast4 || body.apiKey || "").slice(-4),
+      permission_mode: "read-only",
+      symbols: body.symbols || "",
+      category: body.category || "linear",
+      last_sync_status: "not synced"
+    };
+    saveLocalUsers(users.map((entry) => entry.id === user.id ? { ...entry, connections: [connection, ...(entry.connections || [])] } : entry));
+    return { connection };
+  }
+  if (path.startsWith("/api/connections/") && path.endsWith("/sync") && method === "POST") {
+    const connectionId = path.split("/").at(-2);
+    saveLocalUsers(users.map((entry) => entry.id === user.id ? {
+      ...entry,
+      connections: (entry.connections || []).map((item) => item.id === connectionId ? {
+        ...item,
+        last_sync_status: "error",
+        last_sync_error: "GitHub Pages static mode cannot connect to exchange APIs. Run the Node server deployment for live exchange sync.",
+        updated_at: new Date().toISOString()
+      } : item)
+    } : entry));
+    return { ok: false, error: "static_pages_no_exchange_sync" };
+  }
+  if (path.startsWith("/api/connections/") && method === "DELETE") {
+    const connectionId = path.split("/").pop();
+    saveLocalUsers(users.map((entry) => entry.id === user.id ? { ...entry, connections: (entry.connections || []).filter((item) => item.id !== connectionId) } : entry));
+    return { ok: true };
+  }
+  if (path === "/api/import/csv" && method === "POST") return localImportCsv(body.text || "");
+  if (path === "/api/account" && method === "DELETE") {
+    saveLocalUsers(users.filter((entry) => entry.id !== user.id));
+    clearLocalSession();
+    return { ok: true };
+  }
+  throw new Error(`unsupported_static_api:${url.pathname}`);
 }
 
 function normalizeTags(value) {
