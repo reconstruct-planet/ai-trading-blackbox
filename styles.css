@@ -496,6 +496,65 @@ h1 span {
   gap: 14px;
 }
 
+.plan-section .section-header p {
+  max-width: 760px;
+  color: var(--muted-strong);
+  font-size: 17px;
+  line-height: 1.72;
+}
+
+.free-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.plan-card {
+  min-height: 230px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 20px;
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+  background:
+    linear-gradient(180deg, rgba(79, 219, 255, 0.055), rgba(12, 22, 31, 0.62)),
+    var(--panel);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 22px 60px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(18px);
+}
+
+.plan-card.is-live {
+  border-color: rgba(255, 209, 102, 0.34);
+  background:
+    linear-gradient(180deg, rgba(255, 209, 102, 0.1), rgba(12, 22, 31, 0.62)),
+    var(--panel);
+}
+
+.plan-card span {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.plan-card.is-live span {
+  color: var(--amber);
+}
+
+.plan-card h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.plan-card p {
+  margin-bottom: 0;
+  color: var(--muted-strong);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
 .feature-card {
   min-height: 260px;
   border-radius: 22px;
@@ -713,6 +772,7 @@ h1 span {
   }
 
   .pattern-grid,
+  .free-plan-grid,
   .workflow,
   .proof-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -773,6 +833,7 @@ h1 span {
 
   .deck-grid,
   .pattern-grid,
+  .free-plan-grid,
   .workflow,
   .proof-strip,
   .waitlist-form {

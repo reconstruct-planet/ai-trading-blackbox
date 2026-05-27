@@ -191,8 +191,8 @@ waitlistForm.addEventListener("submit", (event) => {
   const exchange = data.get("exchange");
   const hasApiKey = Boolean(String(data.get("apiKey") || "").trim());
   formNote.textContent = hasApiKey
-    ? `${exchange} read-only API 연결 준비가 완료되었습니다. Free Plan 대시보드에서 체결 내역 동기화를 시작합니다.`
-    : `${exchange}를 선택했습니다. Free Plan으로 시작하고, 대시보드에서 API 키 또는 CSV 업로드를 연결할 수 있습니다.`;
+    ? `${exchange} read-only API 연결 UX를 확인했습니다. 현재는 데모라 키를 저장하지 않고, 실제 동기화는 백엔드 연결 후 작동합니다.`
+    : `${exchange}를 선택했습니다. Free Plan에서는 API 키 연결 또는 CSV 업로드로 체결 내역을 가져오는 흐름을 제공합니다.`;
   waitlistForm.reset();
 });
 

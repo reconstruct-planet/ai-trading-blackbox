@@ -20,6 +20,7 @@
       </a>
       <nav class="site-nav" aria-label="주요 섹션">
         <a href="#patterns">패턴</a>
+        <a href="#free-plan">무료 플랜</a>
         <a href="#workflow">흐름</a>
         <a href="#security">보안</a>
         <a href="#start">API 연결</a>
@@ -99,6 +100,48 @@
         <div>
           <strong>Weekly</strong>
           <span>AI 복기 리포트</span>
+        </div>
+      </section>
+
+      <section class="section plan-section" id="free-plan">
+        <div class="section-header">
+          <p class="section-label">FREE PLAN</p>
+          <h2>무료 플랜에서 바로 쓸 수 있어야 하는 기능을 명확히 보여줍니다.</h2>
+          <p>
+            현재 공개된 페이지는 프론트엔드 프로토타입입니다. 아래 항목은 Free Plan 제품 범위이며, 실제 로그인과 거래소 동기화는 백엔드, 데이터베이스, API 키 암호화 저장소가 붙어야 작동합니다.
+          </p>
+        </div>
+        <div class="free-plan-grid">
+          <article class="plan-card is-live">
+            <span>현재 데모</span>
+            <h3>AI 관제실 미리보기</h3>
+            <p>랜딩 화면, 움직이는 커맨드센터 UI, 데모 스캔 버튼, API 연결 폼의 화면 반응을 확인할 수 있습니다.</p>
+          </article>
+          <article class="plan-card">
+            <span>Free 포함</span>
+            <h3>매매일지 기록</h3>
+            <p>종목, 방향, 진입가, 청산가, 레버리지, 손절가, 감정 태그, 진입 근거를 기록하는 기본 저널입니다.</p>
+          </article>
+          <article class="plan-card">
+            <span>Free 포함</span>
+            <h3>CSV 업로드</h3>
+            <p>거래소 체결 내역 CSV를 업로드해 손익, 수수료, 포지션 크기, 반복 손실 패턴을 정리합니다.</p>
+          </article>
+          <article class="plan-card">
+            <span>Free 포함</span>
+            <h3>선물 API 연결</h3>
+            <p>Binance Futures, Bybit Derivatives, OKX Futures의 read-only API로 체결 내역만 불러옵니다.</p>
+          </article>
+          <article class="plan-card">
+            <span>Free 포함</span>
+            <h3>AI 손실 패턴 스캔</h3>
+            <p>손절 미준수, FOMO 진입, Revenge trade, 과도한 레버리지 같은 반복 행동을 찾아냅니다.</p>
+          </article>
+          <article class="plan-card">
+            <span>Free 포함</span>
+            <h3>주간 복기 리포트</h3>
+            <p>한 주의 가장 비싼 실수, 지켜야 할 규칙, 다음 거래 전 체크리스트를 요약합니다.</p>
+          </article>
         </div>
       </section>
 
@@ -195,7 +238,7 @@
         <p class="section-label">START FREE</p>
         <h2>로그인하면 Free Plan으로 바로 시작합니다.</h2>
         <p>
-          카드 등록 없이 매매일지, CSV 업로드, 선물 거래소 read-only API 연결을 먼저 써보세요. 첫 화면은 내 거래 내역을 연결하는 온보딩으로 시작됩니다.
+          카드 등록 없이 매매일지, CSV 업로드, 선물 거래소 read-only API 연결을 먼저 쓰는 흐름입니다. 현재 화면에서는 연결 폼의 UX만 확인할 수 있고, 실제 계정과 동기화는 다음 개발 단계에서 붙습니다.
         </p>
         <div class="plan-strip" aria-label="무료 플랜 포함 기능">
           <span>무료 매매일지</span>
@@ -222,7 +265,7 @@
           </label>
           <button type="submit">무료 플랜 시작</button>
         </form>
-        <p class="form-note" id="formNote">주문과 출금 권한이 없는 read-only API만 연결됩니다. API 키는 데모 화면에 저장되지 않습니다.</p>
+        <p class="form-note" id="formNote">데모 화면입니다. 주문과 출금 권한이 없는 read-only API만 허용하며, 이 화면에서는 API 키가 저장되지 않습니다.</p>
       </section>
     </main>
 
