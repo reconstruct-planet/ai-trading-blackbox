@@ -34,9 +34,14 @@ const heroRuleMeta = document.querySelector("#heroRuleMeta");
 
 const connectionForm = document.querySelector("#connectionForm");
 const connectionList = document.querySelector("#connectionList");
+const importForm = document.querySelector("#importForm");
+const importFileInput = document.querySelector("#importFile");
+const importNote = document.querySelector("#importNote");
 const reviewSummary = document.querySelector("#reviewSummary");
 const reviewRange = document.querySelector("#reviewRange");
 const reviewChecklist = document.querySelector("#reviewChecklist");
+const reviewWins = document.querySelector("#reviewWins");
+const reviewLosses = document.querySelector("#reviewLosses");
 const reviewDetail = document.querySelector("#reviewDetail");
 const generateReviewBtn = document.querySelector("#generateReviewBtn");
 const calendarGrid = document.querySelector("#calendarGrid");
@@ -198,12 +203,14 @@ function setBusy(nextBusy, context = "trade") {
   tradeReset.disabled = nextBusy;
   logoutBtn.disabled = nextBusy;
   connectionForm.querySelector('button[type="submit"]').disabled = nextBusy;
+  if (importForm) importForm.querySelector('button[type="submit"]').disabled = nextBusy;
   generateReviewBtn.disabled = nextBusy;
   exportBtn.disabled = nextBusy;
   deleteAccountBtn.disabled = nextBusy;
   if (context === "auth") authSubmit.textContent = nextBusy ? "처리 중..." : authMode === "signup" ? "회원가입" : "로그인";
   if (context === "trade") tradeSubmit.textContent = nextBusy ? "저장 중..." : tradeIdInput.value ? "거래 수정" : "거래 저장";
   if (context === "connection") connectionForm.querySelector('button[type="submit"]').textContent = nextBusy ? "저장 중..." : "연결 저장";
+  if (context === "import" && importForm) importForm.querySelector('button[type="submit"]').textContent = nextBusy ? "가져오는 중..." : "CSV 가져오기";
 }
 
 function setAuthMode(nextMode) {
@@ -255,7 +262,7 @@ async function loadDashboardData() {
   state.trades = (tradesRes.trades || []).map(formatTrade);
   state.attachments = tradesRes.attachments || [];
   state.summary = summaryRes.summary || null;
-  state.weeklyReview = reviewRes.review || reviewRes.computed || null;
+  state.weeklyReview = reviewRes.computed || reviewRes.review || null;
   state.calendar = summaryRes.calendar || [];
   state.connections = connectionsRes.connections || [];
 }
@@ -355,6 +362,7 @@ function renderTrades() {
           <td>${escapeHtml(formatDate(trade.tradeDate))}</td>
           <td><strong>${escapeHtml(trade.symbol)}</strong></td>
           <td>${escapeHtml(trade.marketType)}</td>
+          <td>${escapeHtml(trade.source || "manual")}</td>
           <td>${escapeHtml(sideLabel(trade.side))} ${trade.leverage}x</td>
           <td class="${pnl >= 0 ? "positive" : "negative"}">${escapeHtml(formatUSDT(pnl))}</td>
           <td>${escapeHtml((trade.emotionTags && trade.emotionTags[0]) || "Calm")}</td>
@@ -383,8 +391,12 @@ function renderConnections() {
                 <span>${escapeHtml(connection.exchange)}</span>
                 <strong>${escapeHtml(connection.label)}</strong>
                 <p>${escapeHtml(connection.permission_mode)} · ${escapeHtml(connection.api_key_last4 || "----")} · ${escapeHtml(connection.status)}</p>
+                <small>${escapeHtml(connection.symbols || "symbols not set")} · ${escapeHtml(connection.category || "-")} · ${escapeHtml(connection.last_sync_status || "not synced")}${connection.last_sync_error ? ` · ${escapeHtml(connection.last_sync_error)}` : ""}</small>
               </div>
-              <button type="button" class="inline-button danger" data-connection-delete="${connection.id}">삭제</button>
+              <div class="row-actions">
+                <button type="button" class="inline-button" data-connection-sync="${connection.id}">동기화</button>
+                <button type="button" class="inline-button danger" data-connection-delete="${connection.id}">삭제</button>
+              </div>
             </article>
           `
         )
@@ -398,14 +410,22 @@ function renderReview() {
     reviewSummary.textContent = "로그인 후 생성됩니다.";
     reviewRange.textContent = "-";
     reviewChecklist.innerHTML = "";
+    reviewWins.innerHTML = "";
+    reviewLosses.innerHTML = "";
     reviewDetail.textContent = "-";
     return;
   }
   reviewSummary.textContent = review.summary || "주간 복기";
-  reviewRange.textContent = `${formatWeek(review.week_start)} - ${formatWeek(review.week_end)}`;
-  const checklist = JSON.parse(review.checklist || "[]");
+  const weekStart = review.week_start || review.weekStart;
+  const weekEnd = review.week_end || review.weekEnd;
+  reviewRange.textContent = `${formatWeek(weekStart)} - ${formatWeek(weekEnd)}`;
+  const checklist = Array.isArray(review.checklist) ? review.checklist : JSON.parse(review.checklist || "[]");
   reviewChecklist.innerHTML = checklist.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-  reviewDetail.textContent = review.summary || "-";
+  const wins = Array.isArray(review.topWins) ? review.topWins : [];
+  const losses = Array.isArray(review.topLosses) ? review.topLosses : [];
+  reviewWins.innerHTML = wins.length ? wins.map((item) => `<li>${escapeHtml(item)}</li>`).join("") : "<li>기록이 쌓이면 표시됩니다.</li>";
+  reviewLosses.innerHTML = losses.length ? losses.map((item) => `<li>${escapeHtml(item)}</li>`).join("") : "<li>기록이 쌓이면 표시됩니다.</li>";
+  reviewDetail.textContent = `가장 큰 손실: ${review.worstTrade?.symbol || "-"} / 가장 좋은 조건: ${review.bestTrade?.symbol || "-"}`;
 }
 
 function renderCalendar() {
@@ -584,6 +604,11 @@ function attachHandlers() {
       label: String(form.get("label") || "").trim(),
       permissionMode: String(form.get("permissionMode") || "read-only"),
       apiKeyLast4: String(form.get("apiKeyLast4") || "").trim(),
+      apiKey: String(form.get("apiKey") || "").trim(),
+      apiSecret: String(form.get("apiSecret") || "").trim(),
+      baseUrl: String(form.get("baseUrl") || "").trim(),
+      symbols: String(form.get("symbols") || "").trim(),
+      category: String(form.get("category") || "").trim(),
       notes: String(form.get("notes") || "").trim(),
       status: "active"
     };
@@ -599,10 +624,66 @@ function attachHandlers() {
     }
   });
 
+  if (importForm) {
+    importForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (busy || !state.user) return;
+      const file = importFileInput?.files?.[0];
+      if (!file) {
+        importNote.textContent = "CSV 파일을 먼저 선택해 주세요.";
+        return;
+      }
+      setBusy(true, "import");
+      try {
+        const text = await fileToText(file);
+        const result = await request("/api/import/csv", {
+          method: "POST",
+          body: JSON.stringify({ fileName: file.name, text })
+        });
+        importNote.textContent = `CSV ${result.imported || 0}건 가져왔습니다.`;
+        importForm.reset();
+        await loadDashboardData();
+        render();
+      } catch (error) {
+        importNote.textContent = error.message === "empty_csv" ? "비어 있는 CSV입니다." : "CSV 가져오기에 실패했습니다.";
+      } finally {
+        setBusy(false, "import");
+      }
+    });
+  }
+
   connectionList.addEventListener("click", async (event) => {
     const button = event.target.closest("button[data-connection-delete]");
-    if (!button) return;
-    const connectionId = button.dataset.connectionDelete;
+    const syncButton = event.target.closest("button[data-connection-sync]");
+    if (!button && !syncButton) return;
+    const target = button || syncButton;
+    const connectionId = target.dataset.connectionDelete || target.dataset.connectionSync;
+    const connection = state.connections.find((item) => item.id === connectionId);
+    if (!connection) return;
+    if (syncButton) {
+      const symbols = connection.symbols || "";
+      if (!symbols.trim()) {
+        alert("동기화하려면 연결 설정에 심볼 목록을 입력해 주세요.");
+        return;
+      }
+      setBusy(true, "connection");
+      try {
+        const result = await request(`/api/connections/${connectionId}/sync`, {
+          method: "POST",
+          body: JSON.stringify({ category: connection.category, symbols })
+        });
+        await loadDashboardData();
+        render();
+        importNote.textContent = `동기화 완료: ${result.result?.imported || 0}건 추가, ${result.result?.updated || 0}건 갱신`;
+      } catch (error) {
+        await loadDashboardData().catch(() => {});
+        render();
+        alert(error.message === "symbols_required" ? "심볼 목록이 필요합니다." : `동기화 실패: ${error.message}`);
+      } finally {
+        setBusy(false, "connection");
+      }
+      return;
+    }
     if (!confirm("연결을 삭제할까요?")) return;
     setBusy(true, "connection");
     try {
@@ -619,7 +700,7 @@ function attachHandlers() {
     setBusy(true, "trade");
     try {
       const result = await request(`/api/weekly-review?weekStart=${getWeekStartISO()}`);
-      state.weeklyReview = result.review || result.computed;
+      state.weeklyReview = result.computed || result.review;
       render();
     } finally {
       setBusy(false, "trade");
@@ -685,6 +766,15 @@ async function fileToDataUrl(file) {
     reader.onload = () => resolve({ fileName: file.name, mimeType: file.type, dataUrl: reader.result });
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
+  });
+}
+
+async function fileToText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
   });
 }
 

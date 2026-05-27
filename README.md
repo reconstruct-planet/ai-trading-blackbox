@@ -8,6 +8,8 @@ AI Trading Blackbox is a premium dark crypto futures trading journal with a real
 - Create, edit, and delete trades
 - Store screenshots as trade attachments
 - Track exchange connection records
+- Import CSV exports from exchange history files
+- Sync Bybit read-only closed PnL records through an encrypted API connection
 - Generate weekly review summaries and checklists
 - Persist data in a local SQLite database so it survives reloads and restarts
 
