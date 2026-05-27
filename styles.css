@@ -653,10 +653,13 @@ h1 span {
   grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr);
   gap: 14px;
   margin-top: 28px;
+  min-width: 0;
 }
 
 .app-panel {
   position: relative;
+  min-width: 0;
+  max-width: 100%;
   border: 1px solid var(--line);
   border-radius: 24px;
   padding: 22px;
@@ -686,6 +689,7 @@ h1 span {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 16px;
+  min-width: 0;
 }
 
 .panel-head h3 {
@@ -900,6 +904,7 @@ h1 span {
 
 .journal-table-wrap {
   margin-top: 18px;
+  max-width: 100%;
   overflow-x: auto;
 }
 
@@ -1066,6 +1071,110 @@ h1 span {
   margin: 14px 0 0;
 }
 
+.connections-layout,
+.settings-layout,
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.connection-list {
+  display: grid;
+  gap: 12px;
+}
+
+.connection-card,
+.review-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.connection-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.connection-card strong,
+.connection-card span,
+.connection-card small {
+  display: block;
+}
+
+.connection-card small {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.review-card span {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.review-card strong {
+  display: block;
+  margin-top: 10px;
+  line-height: 1.45;
+}
+
+.review-card ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted-strong);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.calendar-head,
+.calendar-cell {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.calendar-head {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.calendar-cell {
+  min-height: 76px;
+  display: grid;
+  align-content: space-between;
+}
+
+.calendar-cell span {
+  font-size: 11px;
+  color: var(--muted-strong);
+  overflow-wrap: anywhere;
+}
+
+.calendar-cell.positive span {
+  color: var(--green);
+}
+
+.calendar-cell.negative span {
+  color: var(--red);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .command-deck {
     animation: deckFloat 7s ease-in-out infinite;
@@ -1206,8 +1315,33 @@ h1 span {
   }
 
   .stats-grid,
-  .journal-grid {
+  .journal-grid,
+  .connections-layout,
+  .settings-layout,
+  .review-grid {
     grid-template-columns: 1fr;
+  }
+
+  .app-panel {
+    padding: 18px;
+  }
+
+  .connection-card {
+    flex-direction: column;
+  }
+
+  .calendar-grid {
+    gap: 6px;
+  }
+
+  .calendar-head,
+  .calendar-cell {
+    padding: 7px;
+    border-radius: 10px;
+  }
+
+  .calendar-cell {
+    min-height: 64px;
   }
 
   .panel-head,

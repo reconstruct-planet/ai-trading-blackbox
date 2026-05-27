@@ -60,8 +60,7 @@ let state = {
   connections: [],
   weeklyReview: null,
   summary: null,
-  calendar: [],
-  loading: false
+  calendar: []
 };
 
 let authMode = localStorage.getItem(STORAGE.authMode) || "signup";
@@ -198,19 +197,32 @@ function emotionLabel(value) {
 
 function setBusy(nextBusy, context = "trade") {
   busy = nextBusy;
-  authSubmit.disabled = nextBusy;
-  tradeSubmit.disabled = nextBusy;
-  tradeReset.disabled = nextBusy;
-  logoutBtn.disabled = nextBusy;
-  connectionForm.querySelector('button[type="submit"]').disabled = nextBusy;
-  if (importForm) importForm.querySelector('button[type="submit"]').disabled = nextBusy;
-  generateReviewBtn.disabled = nextBusy;
-  exportBtn.disabled = nextBusy;
-  deleteAccountBtn.disabled = nextBusy;
+  renderControlState();
   if (context === "auth") authSubmit.textContent = nextBusy ? "처리 중..." : authMode === "signup" ? "회원가입" : "로그인";
   if (context === "trade") tradeSubmit.textContent = nextBusy ? "저장 중..." : tradeIdInput.value ? "거래 수정" : "거래 저장";
   if (context === "connection") connectionForm.querySelector('button[type="submit"]').textContent = nextBusy ? "저장 중..." : "연결 저장";
   if (context === "import" && importForm) importForm.querySelector('button[type="submit"]').textContent = nextBusy ? "가져오는 중..." : "CSV 가져오기";
+}
+
+function setControlsDisabled(root, disabled, exceptions = []) {
+  root.querySelectorAll("input, select, textarea, button").forEach((control) => {
+    if (exceptions.includes(control.id)) return;
+    control.disabled = disabled;
+    control.setAttribute("aria-disabled", String(disabled));
+  });
+}
+
+function renderControlState() {
+  const signedIn = Boolean(state.user);
+  authSubmit.disabled = busy;
+  logoutBtn.disabled = busy || !signedIn;
+  setControlsDisabled(tradeForm, !signedIn || busy, ["tradeReset"]);
+  tradeReset.disabled = busy || !signedIn;
+  setControlsDisabled(connectionForm, !signedIn || busy);
+  if (importForm) setControlsDisabled(importForm, !signedIn || busy);
+  generateReviewBtn.disabled = !signedIn || busy;
+  exportBtn.disabled = !signedIn || busy;
+  deleteAccountBtn.disabled = !signedIn || busy;
 }
 
 function setAuthMode(nextMode) {
@@ -293,13 +305,7 @@ function render() {
   logoutBtn.hidden = !signedIn;
   dashboardStatus.textContent = signedIn ? `로그인됨 · ${state.user.email}` : "로그인 필요";
   sessionEmail.textContent = signedIn ? state.user.email : "-";
-  tradeForm.querySelectorAll("input, select, textarea, button").forEach((control) => {
-    if (control.id === "tradeReset") return;
-    control.disabled = !signedIn || busy;
-  });
-  connectionForm.querySelectorAll("input, select, textarea, button").forEach((control) => {
-    control.disabled = !signedIn || busy;
-  });
+  renderControlState();
   document.querySelector("#app .dashboard-panel")?.classList.toggle("is-locked", !signedIn);
 
   const stats = statsForTrades(state.trades);
@@ -385,7 +391,9 @@ function renderConnections() {
   connectionList.innerHTML = state.connections.length
     ? state.connections
         .map(
-          (connection) => `
+          (connection) => {
+            const canSync = String(connection.exchange || "").toLowerCase().includes("bybit");
+            return `
             <article class="connection-card">
               <div>
                 <span>${escapeHtml(connection.exchange)}</span>
@@ -394,11 +402,12 @@ function renderConnections() {
                 <small>${escapeHtml(connection.symbols || "symbols not set")} · ${escapeHtml(connection.category || "-")} · ${escapeHtml(connection.last_sync_status || "not synced")}${connection.last_sync_error ? ` · ${escapeHtml(connection.last_sync_error)}` : ""}</small>
               </div>
               <div class="row-actions">
-                <button type="button" class="inline-button" data-connection-sync="${connection.id}">동기화</button>
+                ${canSync ? `<button type="button" class="inline-button" data-connection-sync="${connection.id}">동기화</button>` : ""}
                 <button type="button" class="inline-button danger" data-connection-delete="${connection.id}">삭제</button>
               </div>
             </article>
-          `
+          `;
+          }
         )
         .join("")
     : `<div class="journal-empty"><strong>저장된 연결이 없습니다.</strong><p>읽기 전용 키만 추가할 수 있습니다.</p></div>`;
@@ -674,11 +683,15 @@ function attachHandlers() {
         });
         await loadDashboardData();
         render();
+        if (result.ok === false) {
+          importNote.textContent = `동기화 실패: ${result.error || "알 수 없는 오류"}`;
+          return;
+        }
         importNote.textContent = `동기화 완료: ${result.result?.imported || 0}건 추가, ${result.result?.updated || 0}건 갱신`;
       } catch (error) {
         await loadDashboardData().catch(() => {});
         render();
-        alert(error.message === "symbols_required" ? "심볼 목록이 필요합니다." : `동기화 실패: ${error.message}`);
+        importNote.textContent = error.message === "symbols_required" ? "심볼 목록이 필요합니다." : `동기화 실패: ${error.message}`;
       } finally {
         setBusy(false, "connection");
       }
@@ -708,6 +721,11 @@ function attachHandlers() {
   });
 
   exportBtn.addEventListener("click", async () => {
+    if (!state.user) {
+      authNote.textContent = "내보내기는 로그인 후 사용할 수 있습니다.";
+      window.location.hash = "#app";
+      return;
+    }
     const payload = {
       user: state.user,
       trades: state.trades,
@@ -725,6 +743,11 @@ function attachHandlers() {
   });
 
   deleteAccountBtn.addEventListener("click", async () => {
+    if (!state.user) {
+      authNote.textContent = "계정 삭제는 로그인 후 사용할 수 있습니다.";
+      window.location.hash = "#app";
+      return;
+    }
     if (!confirm("계정과 모든 데이터를 삭제할까요?")) return;
     await request("/api/account", { method: "DELETE", body: JSON.stringify({}) }).catch(() => {});
     await request("/api/auth/logout", { method: "POST", body: JSON.stringify({}) }).catch(() => {});
@@ -909,12 +932,6 @@ function drawCanvas(time = 0) {
   drawNodes(time);
   drawScanFrame(time);
   requestAnimationFrame(drawCanvas);
-}
-
-async function deleteAccount() {
-  await request("/api/account", { method: "DELETE", body: JSON.stringify({}) });
-  await request("/api/auth/logout", { method: "POST", body: JSON.stringify({}) }).catch(() => {});
-  await refreshSession();
 }
 
 window.addEventListener("resize", resizeCanvas);

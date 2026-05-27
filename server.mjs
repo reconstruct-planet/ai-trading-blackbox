@@ -1,6 +1,6 @@
 import http from "node:http";
 import { createReadStream, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { mkdir, readdir, stat, unlink, writeFile } from "node:fs/promises";
+import { unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
@@ -368,6 +368,15 @@ function computeWeeklyReview(userId, weekStartISO) {
 }
 
 function serveStatic(req, res, pathname) {
+  if (pathname === "/favicon.ico") {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#03070b"/><path d="M15 38h7l5-14 8 25 6-20h8" fill="none" stroke="#4cffb0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="20" r="5" fill="#4fdbff"/></svg>`;
+    res.writeHead(200, {
+      "Content-Type": "image/svg+xml; charset=utf-8",
+      "Content-Length": Buffer.byteLength(svg)
+    });
+    res.end(svg);
+    return true;
+  }
   const fileMap = {
     "/": "index.html",
     "/styles.css": "styles.css",
@@ -645,10 +654,14 @@ async function handleApi(req, res, pathname) {
         db.prepare(
           `UPDATE exchange_connections SET last_sync_at = ?, last_sync_status = ?, last_sync_count = ?, last_sync_error = ? WHERE id = ? AND user_id = ?`
         ).run(nowISO(), "error", 0, String(error.message || error), connectionId, userId);
-        return json(res, 400, { error: String(error.message || error) });
+        return json(res, 200, {
+          ok: false,
+          error: String(error.message || error),
+          connection: safeConnectionRow(db.prepare("SELECT * FROM exchange_connections WHERE id = ?").get(connectionId))
+        });
       }
     }
-    return json(res, 400, { error: "sync_not_supported" });
+    return json(res, 200, { ok: false, error: "sync_not_supported", connection: safeConnectionRow(connection) });
   }
 
   if (pathname === "/api/import/csv" && req.method === "POST") {
