@@ -582,9 +582,31 @@ h1 span {
   margin-right: auto;
 }
 
+.plan-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 22px auto 0;
+}
+
+.plan-strip span {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(76, 255, 176, 0.24);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: rgba(76, 255, 176, 0.08);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .waitlist-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 210px 160px;
+  grid-template-columns: minmax(180px, 1fr) 190px minmax(170px, 0.8fr) 160px;
   gap: 10px;
   margin-top: 26px;
 }

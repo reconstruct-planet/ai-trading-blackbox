@@ -177,7 +177,7 @@ function runDemoScan() {
   aiFeed.innerHTML = `<span>${entries[0]}</span>${entries.slice(1).map((entry) => `<p>${entry}</p>`).join("")}`;
 
   window.setTimeout(() => {
-    scanStatus.textContent = "ACTIVE";
+    scanStatus.textContent = "READY";
     demoPulse.textContent = "데모 스캔 실행";
     aiFeed.classList.remove("is-scanning");
   }, 1400);
@@ -189,7 +189,10 @@ waitlistForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const data = new FormData(waitlistForm);
   const exchange = data.get("exchange");
-  formNote.textContent = `${exchange} 베타 대기열에 등록되었습니다. 첫 버전은 read-only 연결과 주간 복기부터 시작합니다.`;
+  const hasApiKey = Boolean(String(data.get("apiKey") || "").trim());
+  formNote.textContent = hasApiKey
+    ? `${exchange} read-only API 연결 준비가 완료되었습니다. Free Plan 대시보드에서 체결 내역 동기화를 시작합니다.`
+    : `${exchange}를 선택했습니다. Free Plan으로 시작하고, 대시보드에서 API 키 또는 CSV 업로드를 연결할 수 있습니다.`;
   waitlistForm.reset();
 });
 

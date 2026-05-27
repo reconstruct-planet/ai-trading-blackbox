@@ -1,10 +1,10 @@
 # AI Trading Blackbox
 
-Premium dark landing page and command-center prototype for a crypto trading journal that focuses on repeated loss patterns, rule violations, and weekly AI review.
+Premium dark landing page and command-center prototype for a crypto futures trading journal that starts on a free plan and connects read-only exchange APIs.
 
 ## Concept
 
-AI Trading Blackbox is positioned as a futuristic crypto trading command center, not a generic trade journal. The first-screen promise is simple: connect trading data, detect repeated loss behavior, and turn it into a weekly review routine.
+AI Trading Blackbox is positioned as a futuristic crypto trading command center, not a generic trade journal. The first-screen promise is simple: log in, start with the free plan, connect futures exchange data, detect repeated loss behavior, and turn it into a weekly review routine.
 
 ## Files
 
@@ -16,4 +16,3 @@ AI Trading Blackbox is positioned as a futuristic crypto trading command center,
 ## Local Preview
 
 Open `index.html` directly in a browser. No build step is required.
-
